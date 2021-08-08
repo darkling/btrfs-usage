@@ -1,8 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, h1, h2, button, div, text, label, input)
+import Html exposing (Html, h1, h2, button, div, span, text, label, input, br)
 import Html.Attributes exposing (attribute, class, type_, name, value)
+import Html.Events exposing (onInput)
 
 main = Browser.document {
            init = init,
@@ -11,8 +12,7 @@ main = Browser.document {
            subscriptions = subscriptions
        }
 
-type Msg = Increment String Int
-         | Decrement String Int
+type Msg = AlterDeviceCount String
 
 type RaidPreset = Single
                 | RAID0
@@ -36,14 +36,37 @@ init _ = (
           },
           Cmd.none
          )
+
+-- Update
     
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        Increment item value ->
-            (model, Cmd.none)
-        Decrement item value ->
-            (model, Cmd.none)
+        AlterDeviceCount value ->
+            ({model | disk_size = update_disk_list value model.disk_size},
+             Cmd.none)
+             Cmd.none)
+
+update_disk_list: String -> List Int -> List Int
+update_disk_list text_value disks =
+    let
+        value = Maybe.withDefault 1 (String.toInt text_value)
+    in
+        if value == List.length disks then
+            disks
+        else if value < List.length disks then
+                 case List.tail disks of
+                     Nothing ->
+                         update_disk_list text_value []
+                     Just tail ->
+                         update_disk_list text_value tail
+             else -- if value > List.length disks then
+                 case List.head disks of
+                     Nothing ->
+                         update_disk_list text_value (1000 :: disks)
+                     Just size ->
+                         update_disk_list text_value (size :: disks)
+
 
 -- View
 
@@ -71,8 +94,10 @@ view_num_devices disks =
          label [ attribute "for" "num_disks" ] [ text "Number of devices: " ],
          input [ type_ "number",
                  name "num_disks",
+                 attribute "min" "0",
                  attribute "max" "100",
-                 value <| String.fromInt <| List.length disks
+                 value <| String.fromInt <| List.length disks,
+                 onInput AlterDeviceCount
                ] [
                ]
         ]
@@ -81,7 +106,10 @@ view_raid_levels preset =
     div [] []
 
 view_devices disks =
-    div [] []
+    div [] <| List.map disk_to_device_line disks
+
+disk_to_device_line disk =
+    span [] [ text <| String.fromInt disk, br [] [] ]
 
 -- Subscriptions
 
