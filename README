@@ -1,0 +1,11 @@
+btrfs space usage tool
+======================
+
+This is a small web-app to estimate the amount of space that you'll
+get out of btrfs in different disk and RAID configurations.
+
+License
+=======
+
+Licensed under the 3-clause BSD license. See the file LICENSE for more
+details.
