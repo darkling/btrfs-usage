@@ -1,3 +1,6 @@
 build/**
 elm-stuff/**
 *~
+*.aux
+*.dvi
+*.log
