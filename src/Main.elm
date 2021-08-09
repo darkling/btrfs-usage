@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg)
+module Main exposing (main, upper_bound, min_arg, used_space)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -184,10 +184,9 @@ subscriptions model =
 
 upper_bound: List Int -> RaidParams -> (Int, List Int)
 upper_bound disks params =
-    -- Returns a 3-tuple:
-    --   usable space allocated,
-    --   ?,
-    --   list of space used on each disk
+    -- Returns a 2-tuple:
+    --   _usable_ space allocated,
+    --   list of space allocated on each disk
     let
         -- Number of disks total
         n_disks = List.length disks
@@ -214,11 +213,8 @@ upper_bound disks params =
         if n_disks < (params.slo+params.p)*params.c then
             -- Not enough disks: nothing to do
             (0, List.repeat n_disks 0)
-        else if idx == -1 then
-                 -- Trivial bound: we're done
-                 (space_allocated, disks)
-             else
-                 (space_allocated, used_space bd disks)
+        else
+            (space_allocated, used_space (bd*stripe) disks)
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
 bounds_by_disk stripe disks = bounds_by_disk_impl stripe 1 disks
@@ -239,10 +235,21 @@ bounds_by_disk_impl stripe idx disk_list =
                     (idx, disk, bound) :: bounds_by_disk_impl stripe (idx+1) disks
 
 used_space: Int -> List Int -> List Int
-used_space bound disks =
-    List.map
-        (\d -> min d bound)
-        disks
+used_space remaining disks =
+    disks
+        |> List.indexedMap Tuple.pair
+        |> List.foldr used_space_fold ([], remaining)
+        |> Tuple.first
+
+used_space_fold: (Int, Int) -> (List Int, Int) -> (List Int, Int)
+used_space_fold (i, disk) (res, remaining) =
+    let
+        average_fill = remaining // (i+1)
+        this_fill = min average_fill disk
+    in
+        (this_fill :: res,
+         remaining - this_fill
+        )
 
 min_arg: (a -> Int) -> List a -> Maybe a
 min_arg pred list =
