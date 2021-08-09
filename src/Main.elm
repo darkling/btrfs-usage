@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (main, upper_bound, min_arg)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -181,6 +181,87 @@ subscriptions model =
     Sub.none
 
 -- Model
+
+upper_bound: List Int -> RaidParams -> (Int, List Int)
+upper_bound disks params =
+    -- Returns a 3-tuple:
+    --   usable space allocated,
+    --   ?,
+    --   list of space used on each disk
+    let
+        -- Number of disks total
+        n_disks = List.length disks
+        -- Largest disk
+        max_disk = Maybe.withDefault -1 <| List.head disks
+        -- Number of devices available to use
+        avail_devs = min n_disks (params.shi+params.p)*params.c
+        -- Numer of devices actually used (round down to a multiple of copies)
+        stripe = avail_devs - modBy params.c avail_devs
+        -- Trivial bound
+        trivial_bound = (List.sum disks) // stripe
+        -- Possible values for other bounds
+        maybe_bounds = bounds_by_disk stripe disks
+        -- Actual bounds
+        bounds = List.filter (\(i, d, b) -> d >= b) maybe_bounds
+        -- Smallest upper bound
+        actual_bound = min_arg (\(i, d, b) -> b)
+                       <| (-1, max_disk, trivial_bound) :: bounds
+        -- Get the bounding disk index and bound size
+        (idx, _, bd) = Maybe.withDefault (-1, -1, -1) actual_bound
+        -- Available space
+        space_allocated = bd * ((stripe // params.c) - params.p)
+    in
+        if n_disks < (params.slo+params.p)*params.c then
+            -- Not enough disks: nothing to do
+            (0, List.repeat n_disks 0)
+        else if idx == -1 then
+                 -- Trivial bound: we're done
+                 (space_allocated, disks)
+             else
+                 (space_allocated, used_space bd disks)
+
+bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
+bounds_by_disk stripe disks = bounds_by_disk_impl stripe 1 disks
+
+bounds_by_disk_impl stripe idx disk_list =
+    case disk_list of
+        [] ->
+            []
+        [disk] ->
+            []
+        (disk :: disks) ->
+            let
+                bound = (List.sum disks) // (stripe - idx)
+            in
+                if stripe <= idx then
+                    []
+                else
+                    (idx, disk, bound) :: bounds_by_disk_impl stripe (idx+1) disks
+
+used_space: Int -> List Int -> List Int
+used_space bound disks =
+    List.map
+        (\d -> min d bound)
+        disks
+
+min_arg: (a -> Int) -> List a -> Maybe a
+min_arg pred list =
+    case list of
+        [] -> Nothing
+        [item] ->
+            Just item
+        (head :: tail) ->
+            let
+                min_rest_maybe = min_arg pred tail
+            in
+                case min_rest_maybe of
+                    Nothing ->
+                        Just head
+                    Just min_rest ->
+                        if pred head < pred min_rest then
+                            Just head
+                        else
+                            Just min_rest
 
 raid_presets: RaidPreset -> RaidParams
 raid_presets preset =
