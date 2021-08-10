@@ -141,5 +141,33 @@ suite =
                    \_ ->
                    used_space 6 [4, 2, 1]
                    |> Expect.equal [3, 2, 1]
+             ],
+         describe "global_usage"
+             [ test "Should have one group from single" <|
+                   \_ ->
+                   let
+                       params = { c=1, slo=1, shi=1, p=0 }
+                   in
+                       usage params [25, 10, 5]
+
+                   |> Expect.equal [(40, [25, 10, 5])],
+
+               test "Should have one group from RAID-1" <|
+                   \_ ->
+                   let
+                       params = { c=2, slo=1, shi=1, p=0 }
+                   in
+                       usage params [25, 10, 5]
+
+                   |> Expect.equal [(15, [15, 10, 5])],
+
+               test "Should be able to get multiple groups from RAID-0" <|
+                   \_ ->
+                   let
+                       params = { c=1, slo=2, shi=10, p=0 }
+                   in
+                       usage params [4, 2, 1, 1]
+
+                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [1, 1])]
              ]
         ]

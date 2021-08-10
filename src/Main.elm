@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space)
+module Main exposing (main, upper_bound, min_arg, used_space, usage)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -182,6 +182,22 @@ subscriptions model =
 
 -- Model
 
+usage: RaidParams -> List Int -> List (Int, List Int)
+usage params disks =
+    usage_impl params disks
+
+usage_impl: RaidParams -> List Int -> List (Int, List Int)
+usage_impl params disks =
+    let
+        (available, used) = upper_bound params disks
+        reduced_disks = List.map2 (-) disks used
+                        |> List.filter (\x -> x > 0)
+    in
+        if available == 0 then
+            []
+        else
+            (available, used) :: usage_impl params reduced_disks
+
 upper_bound: RaidParams -> List Int -> (Int, List Int)
 upper_bound params disks =
     -- Returns a 2-tuple:
@@ -208,13 +224,13 @@ upper_bound params disks =
         -- Get the bounding disk index and bound size
         (idx, _, bd) = Maybe.withDefault (-1, -1, -1) actual_bound
         -- Available space
-        space_allocated = bd * ((stripe // params.c) - params.p)
+        space_available = bd * ((stripe // params.c) - params.p)
     in
         if n_disks < (params.slo+params.p)*params.c then
             -- Not enough disks: nothing to do
             (0, List.repeat n_disks 0)
         else
-            (space_allocated, used_space (bd*stripe) disks)
+            (space_available, used_space (bd*stripe) disks)
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
 bounds_by_disk stripe disks = bounds_by_disk_impl stripe 1 disks
