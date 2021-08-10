@@ -182,8 +182,8 @@ subscriptions model =
 
 -- Model
 
-upper_bound: List Int -> RaidParams -> (Int, List Int)
-upper_bound disks params =
+upper_bound: RaidParams -> List Int -> (Int, List Int)
+upper_bound params disks =
     -- Returns a 2-tuple:
     --   _usable_ space allocated,
     --   list of space allocated on each disk

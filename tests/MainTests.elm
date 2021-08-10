@@ -16,7 +16,7 @@ suite =
                    let
                        params = { c=1, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [25, 20, 15, 10] params
+                       upper_bound params [25, 20, 15, 10]
 
                    |> Expect.equal (70, [25, 20, 15, 10]),
 
@@ -25,7 +25,7 @@ suite =
                    let
                        params = { c=3, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [25, 15] params
+                       upper_bound params [25, 15]
 
                    |> Expect.equal (0, [0, 0]),
 
@@ -34,7 +34,7 @@ suite =
                    let
                        params = { c=2, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [25, 15] params
+                       upper_bound params [25, 15]
 
                    |> Expect.equal (15, [15, 15]),
 
@@ -43,7 +43,7 @@ suite =
                    let
                        params = { c=2, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [24, 15, 15] params
+                       upper_bound params [24, 15, 15]
 
                    |> Expect.equal (27, [24, 15, 15]),
 
@@ -52,7 +52,7 @@ suite =
                    let
                        params = { c=2, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [25, 15, 15] params
+                       upper_bound params [25, 15, 15]
 
                    |> Expect.equal (27, [24, 15, 15]),
 
@@ -61,7 +61,7 @@ suite =
                    let
                        params = { c=2, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [25, 10, 10] params
+                       upper_bound params [25, 10, 10]
 
                    |> Expect.equal (20, [20, 10, 10]),
 
@@ -70,7 +70,7 @@ suite =
                    let
                        params = { c=3, slo=1, shi=1, p=0 }
                    in
-                       upper_bound [4, 4, 4, 4] params
+                       upper_bound params [4, 4, 4, 4]
 
                    |> Expect.equal (5, [4, 4, 4, 3]),
 
@@ -79,7 +79,7 @@ suite =
                    let
                        params = { c=1, slo=1, shi=100, p=0 }
                    in
-                       upper_bound [25, 15, 15] params
+                       upper_bound params [25, 15, 15]
 
                    |> Expect.equal (45, [15, 15, 15]),
 
@@ -88,7 +88,7 @@ suite =
                    let
                        params = { c=1, slo=1, shi=3, p=0 }
                    in
-                       upper_bound [25, 15, 15, 10] params
+                       upper_bound params [25, 15, 15, 10]
 
                    |> Expect.equal (60, [20, 15, 15, 10]),
 
@@ -97,7 +97,7 @@ suite =
                    let
                        params = { c=2, slo=2, shi=2, p=0 }
                    in
-                       upper_bound [6, 5, 4, 4, 4] params
+                       upper_bound params [6, 5, 4, 4, 4]
 
                    |> Expect.equal (10, [4, 4, 4, 4, 4]),
 
@@ -106,7 +106,7 @@ suite =
                    let
                        params = { c=1, slo=1, shi=5, p=1 }
                    in
-                       upper_bound [25, 15, 15, 10] params
+                       upper_bound params [25, 15, 15, 10]
 
                    |> Expect.equal (30, [10, 10, 10, 10])
              ],
