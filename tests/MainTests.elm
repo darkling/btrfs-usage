@@ -18,7 +18,7 @@ suite =
                    in
                        upper_bound params [25, 20, 15, 10]
 
-                   |> Expect.equal (70, [25, 20, 15, 10]),
+                   |> Expect.equal { usable=70, disks=[25, 20, 15, 10] },
 
                test "Too few disks (RAID-1) should use no space" <|
                    \_ ->
@@ -27,7 +27,7 @@ suite =
                    in
                        upper_bound params [25, 15]
 
-                   |> Expect.equal (0, [0, 0]),
+                   |> Expect.equal { usable=0, disks=[0, 0] },
 
                test "RAID-1 should fill the smaller device of two" <|
                    \_ ->
@@ -36,7 +36,7 @@ suite =
                    in
                        upper_bound params [25, 15]
 
-                   |> Expect.equal (15, [15, 15]),
+                   |> Expect.equal { usable=15, disks=[15, 15] },
 
                test "RAID-1 should fill all devices, if approximately even" <|
                    \_ ->
@@ -45,7 +45,7 @@ suite =
                    in
                        upper_bound params [24, 15, 15]
 
-                   |> Expect.equal (27, [24, 15, 15]),
+                   |> Expect.equal { usable=27, disks=[24, 15, 15] },
 
                test "RAID-1 should fill almost all devices, if approximately even" <|
                    \_ ->
@@ -54,7 +54,7 @@ suite =
                    in
                        upper_bound params [25, 15, 15]
 
-                   |> Expect.equal (27, [24, 15, 15]),
+                   |> Expect.equal { usable=27, disks=[24, 15, 15] },
 
                test "RAID-1 should fill smaller devices, if uneven" <|
                    \_ ->
@@ -63,7 +63,7 @@ suite =
                    in
                        upper_bound params [25, 10, 10]
 
-                   |> Expect.equal (20, [20, 10, 10]),
+                   |> Expect.equal { usable=20, disks=[20, 10, 10] },
 
                test "RAID-1c3 should fill from the left" <|
                    \_ ->
@@ -72,7 +72,7 @@ suite =
                    in
                        upper_bound params [4, 4, 4, 4]
 
-                   |> Expect.equal (5, [4, 4, 4, 3]),
+                   |> Expect.equal { usable=5, disks=[4, 4, 4, 3] },
 
                test "RAID-0 should fill the smallest device only" <|
                    \_ ->
@@ -81,7 +81,7 @@ suite =
                    in
                        upper_bound params [25, 15, 15]
 
-                   |> Expect.equal (45, [15, 15, 15]),
+                   |> Expect.equal { usable=45, disks=[15, 15, 15] },
 
                test "Bounded RAID-0 should fill more devices" <|
                    \_ ->
@@ -90,7 +90,7 @@ suite =
                    in
                        upper_bound params [25, 15, 15, 10]
 
-                   |> Expect.equal (60, [20, 15, 15, 10]),
+                   |> Expect.equal {usable=60, disks=[20, 15, 15, 10] },
 
                test "RAID-10 should fill almost everything" <|
                    \_ ->
@@ -99,7 +99,7 @@ suite =
                    in
                        upper_bound params [6, 5, 4, 4, 4]
 
-                   |> Expect.equal (10, [4, 4, 4, 4, 4]),
+                   |> Expect.equal { usable=10, disks=[4, 4, 4, 4, 4] },
 
                test "RAID-5 should allocate all the devices" <|
                    \_ ->
@@ -108,7 +108,7 @@ suite =
                    in
                        upper_bound params [25, 15, 15, 10]
 
-                   |> Expect.equal (30, [10, 10, 10, 10])
+                   |> Expect.equal { usable=30, disks=[10, 10, 10, 10] }
              ],
          describe "min_arg"
              [ test "Should return the list element with the minimum value" <|
@@ -150,7 +150,7 @@ suite =
                    in
                        usage params [25, 10, 5]
 
-                   |> Expect.equal [(40, [25, 10, 5])],
+                   |> Expect.equal [{ usable=40, disks=[25, 10, 5] }],
 
                test "Should have one group from RAID-1" <|
                    \_ ->
@@ -159,7 +159,7 @@ suite =
                    in
                        usage params [25, 10, 5]
 
-                   |> Expect.equal [(15, [15, 10, 5])],
+                   |> Expect.equal [{ usable=15, disks=[15, 10, 5] }],
 
                test "Should be able to get multiple groups from RAID-0" <|
                    \_ ->
@@ -168,7 +168,8 @@ suite =
                    in
                        usage params [4, 2, 1, 1]
 
-                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [1, 1, 0, 0])],
+                   |> Expect.equal [{ usable=4, disks=[1, 1, 1, 1] },
+                                    { usable=2, disks=[1, 1, 0, 0] }],
 
                test "Should work with unordered lists" <|
                    \_ ->
@@ -177,6 +178,7 @@ suite =
                    in
                        usage params [1, 1, 4, 2]
 
-                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [0, 0, 1, 1])]
+                   |> Expect.equal [{ usable=4, disks=[1, 1, 1, 1] },
+                                    { usable=2, disks=[0, 0, 1, 1] }]
              ]
         ]

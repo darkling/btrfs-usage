@@ -34,6 +34,11 @@ type alias Model = {
         raid_level: RaidParams
     }
 
+type alias Allocation = {
+        usable: Int,
+        disks: List Int
+    }
+
 init: () -> (Model, Cmd Msg)
 init _ = (
           {
@@ -182,7 +187,7 @@ subscriptions model =
 
 -- Model
 
-usage: RaidParams -> List Int -> List (Int, List Int)
+usage: RaidParams -> List Int -> List Allocation
 usage params disks =
     let
         id_map = disks
@@ -194,31 +199,31 @@ usage params disks =
         usage_ordered params ord_disks
             |> List.map (reorder_disks perm)
 
-reorder_disks: List Int -> (Int, List Int) -> (Int, List Int)
-reorder_disks perm (used, disks) =
-    (used,
-     disks
+reorder_disks: List Int -> Allocation -> Allocation
+reorder_disks perm { usable, disks } =
+    { usable = usable,
+      disks = disks
          |> List.map2 Tuple.pair perm
          |> List.sort
          |> List.map Tuple.second
-    )
+    }
 
-usage_ordered: RaidParams -> List Int -> List (Int, List Int)
+usage_ordered: RaidParams -> List Int -> List Allocation
 usage_ordered params disks =
     usage_impl params disks
 
-usage_impl: RaidParams -> List Int -> List (Int, List Int)
-usage_impl params disks =
+usage_impl: RaidParams -> List Int -> List Allocation
+usage_impl params input_disks =
     let
-        (available, used) = upper_bound params disks
-        reduced_disks = List.map2 (-) disks used
+        { usable, disks } = upper_bound params input_disks
+        reduced_disks = List.map2 (-) input_disks disks
     in
-        if available == 0 then
+        if usable == 0 then
             []
         else
-            (available, used) :: usage_impl params reduced_disks
+            { usable=usable, disks=disks } :: usage_impl params reduced_disks
 
-upper_bound: RaidParams -> List Int -> (Int, List Int)
+upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
     -- Returns a 2-tuple:
     --   _usable_ space allocated,
@@ -248,9 +253,9 @@ upper_bound params disks =
     in
         if n_disks < (params.slo+params.p)*params.c then
             -- Not enough disks: nothing to do
-            (0, List.repeat n_disks 0)
+            { usable=0, disks=List.repeat n_disks 0 }
         else
-            (space_available, used_space (bd*stripe) disks)
+            { usable=space_available, disks=used_space (bd*stripe) disks }
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
 bounds_by_disk stripe disks = bounds_by_disk_impl stripe 1 disks
