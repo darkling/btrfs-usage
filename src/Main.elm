@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space, usage)
+module Main exposing (main, upper_bound, min_arg, used_space, usage, usage_ordered)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -184,6 +184,27 @@ subscriptions model =
 
 usage: RaidParams -> List Int -> List (Int, List Int)
 usage params disks =
+    let
+        id_map = disks
+                 |> List.indexedMap Tuple.pair
+                 |> List.sortBy (\t -> negate <| Tuple.second t)
+        perm = List.map Tuple.first id_map
+        ord_disks = List.map Tuple.second id_map
+    in
+        usage_ordered params ord_disks
+            |> List.map (reorder_disks perm)
+
+reorder_disks: List Int -> (Int, List Int) -> (Int, List Int)
+reorder_disks perm (used, disks) =
+    (used,
+     disks
+         |> List.map2 Tuple.pair perm
+         |> List.sort
+         |> List.map Tuple.second
+    )
+
+usage_ordered: RaidParams -> List Int -> List (Int, List Int)
+usage_ordered params disks =
     usage_impl params disks
 
 usage_impl: RaidParams -> List Int -> List (Int, List Int)

@@ -169,5 +169,14 @@ suite =
                        usage params [4, 2, 1, 1]
 
                    |> Expect.equal [(4, [1, 1, 1, 1]), (2, [1, 1, 0, 0])],
+
+               test "Should work with unordered lists" <|
+                   \_ ->
+                   let
+                       params = { c=1, slo=2, shi=10, p=0 }
+                   in
+                       usage params [1, 1, 4, 2]
+
+                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [0, 0, 1, 1])]
              ]
         ]
