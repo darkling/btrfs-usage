@@ -142,7 +142,7 @@ suite =
                    used_space 6 [4, 2, 1]
                    |> Expect.equal [3, 2, 1]
              ],
-         describe "global_usage"
+         describe "usage"
              [ test "Should have one group from single" <|
                    \_ ->
                    let
