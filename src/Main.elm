@@ -3,7 +3,8 @@ module Main exposing (main, upper_bound, min_arg, used_space, usage, usage_order
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
                       table, tr, td)
-import Html.Attributes exposing (attribute, class, type_, name, value, checked)
+import Html.Attributes exposing (attribute, class, type_, name, value,
+                                 checked, style)
 import Html.Events exposing (onInput, onClick)
 
 main = Browser.document {
@@ -121,7 +122,8 @@ view model =
         title = "btrfs disk usage calculator",
         body = [
              h1 [] [ text "btrfs disk usage calcuator" ],
-             view_num_devices model.disk_size,
+             div [ class "main-section" ]
+                 <| view_num_devices model.disk_size,
              div [ class "main-section" ]
                  [ h2 []  [ text "RAID levels" ],
                    div [ class "raid-params" ]
@@ -135,16 +137,15 @@ view model =
     }
 
 view_num_devices disks =
-    div [] [
-         label [ attribute "for" "num_disks" ] [ text "Number of devices: " ],
-         input [ type_ "number",
-                 name "num_disks",
-                 attribute "min" "0",
-                 attribute "max" "100",
-                 value <| String.fromInt <| List.length disks,
-                 onInput AlterDeviceCount
-               ] []
-        ]
+    [ label [ attribute "for" "num_disks" ] [ text "Number of devices: " ],
+      input [ type_ "number",
+              name "num_disks",
+              attribute "min" "0",
+              attribute "max" "100",
+              value <| String.fromInt <| List.length disks,
+              onInput AlterDeviceCount
+            ] []
+    ]
 
 view_raid_params level =
     div [] [ table [] [
@@ -168,17 +169,23 @@ raid_param_line label ctrl_name param_value event =
         ]
 
 view_devices disks =
-    div [] <| List.reverse <| List.indexedMap disk_to_device_line disks
+    table [ class "" ]
+        <| List.reverse <| List.indexedMap disk_to_device_line disks
 
 disk_to_device_line i disk =
-    span [] [ input [ type_ "number",
-                      name ("disk_size" ++ (String.fromInt i)),
-                      attribute "min" "0",
-                      value <| String.fromInt disk,
-                      onInput <| AlterDeviceSize i
-                    ] [],
-              br [] []
-            ]
+    tr [] [ td [] [ input [ type_ "number",
+                            class "disk-size",
+                            name ("disk_size" ++ (String.fromInt i)),
+                            attribute "min" "0",
+                            value <| String.fromInt disk,
+                            onInput <| AlterDeviceSize i
+                          ] []
+                  ],
+            td [] [ div [ class "usage-bar",
+                          style "width" "300px"
+                        ] []
+                  ]
+          ]
 
 -- Subscriptions
 
