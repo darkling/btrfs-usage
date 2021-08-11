@@ -168,6 +168,6 @@ suite =
                    in
                        usage params [4, 2, 1, 1]
 
-                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [1, 1])]
+                   |> Expect.equal [(4, [1, 1, 1, 1]), (2, [1, 1, 0, 0])],
              ]
         ]

@@ -191,7 +191,6 @@ usage_impl params disks =
     let
         (available, used) = upper_bound params disks
         reduced_disks = List.map2 (-) disks used
-                        |> List.filter (\x -> x > 0)
     in
         if available == 0 then
             []
@@ -205,7 +204,7 @@ upper_bound params disks =
     --   list of space allocated on each disk
     let
         -- Number of disks total
-        n_disks = List.length disks
+        n_disks = List.length <| List.filter (\x -> x > 0) disks
         -- Largest disk
         max_disk = Maybe.withDefault -1 <| List.head disks
         -- Number of devices available to use
