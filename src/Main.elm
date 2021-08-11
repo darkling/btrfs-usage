@@ -36,6 +36,7 @@ type alias Model = {
 
 type alias Allocation = {
         usable: Int,
+        stripe: Int,
         disks: List Int
     }
 
@@ -200,12 +201,12 @@ usage params disks =
             |> List.map (reorder_disks perm)
 
 reorder_disks: List Int -> Allocation -> Allocation
-reorder_disks perm { usable, disks } =
-    { usable = usable,
-      disks = disks
-         |> List.map2 Tuple.pair perm
-         |> List.sort
-         |> List.map Tuple.second
+reorder_disks perm alloc =
+    { alloc |
+      disks = alloc.disks
+          |> List.map2 Tuple.pair perm
+          |> List.sort
+          |> List.map Tuple.second
     }
 
 usage_ordered: RaidParams -> List Int -> List Allocation
@@ -215,13 +216,14 @@ usage_ordered params disks =
 usage_impl: RaidParams -> List Int -> List Allocation
 usage_impl params input_disks =
     let
-        { usable, disks } = upper_bound params input_disks
+        return_value = upper_bound params input_disks
+        { usable, disks } = return_value
         reduced_disks = List.map2 (-) input_disks disks
     in
         if usable == 0 then
             []
         else
-            { usable=usable, disks=disks } :: usage_impl params reduced_disks
+            return_value :: usage_impl params reduced_disks
 
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
@@ -253,9 +255,15 @@ upper_bound params disks =
     in
         if n_disks < (params.slo+params.p)*params.c then
             -- Not enough disks: nothing to do
-            { usable=0, disks=List.repeat n_disks 0 }
+            { usable=0,
+              stripe=stripe,
+              disks=List.repeat n_disks 0
+            }
         else
-            { usable=space_available, disks=used_space (bd*stripe) disks }
+            { usable=space_available,
+              stripe=stripe,
+              disks=used_space (bd*stripe) disks
+            }
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
 bounds_by_disk stripe disks = bounds_by_disk_impl stripe 1 disks
