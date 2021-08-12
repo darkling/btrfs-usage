@@ -122,7 +122,7 @@ view model =
     {
         title = "btrfs disk usage calculator",
         body = [
-             h1 [] [ text "btrfs disk usage calcuator" ],
+             h1 [] [ text "btrfs disk usage calculator" ],
              div [ class "main-section" ]
                  <| view_num_devices model.disk_size,
              div [ class "main-section" ]
