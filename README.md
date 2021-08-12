@@ -2,13 +2,13 @@ btrfs space usage tool
 ======================
 
 This is a small web-app to estimate the amount of space that you'll
-get out of [https://btrfs.wiki.kernel.org/index.php/Main_Page](btrfs)
+get out of [btrfs](https://btrfs.wiki.kernel.org/index.php/Main_Page)
 in different disk and RAID configurations.
 
 Build and deployment
 ====================
 
-This project is written entirely in [https://elm-lang.org/](elm), so
+This project is written entirely in [elm](https://elm-lang.org/), so
 you will need to install the elm compiler.
 
 To build, simply:
@@ -18,7 +18,7 @@ To build, simply:
 ```
 
 Unit tests are provided with
-[https://github.com/elm-explorations/test](elm-test):
+[elm-test](https://github.com/elm-explorations/test):
 
 ```sh
  $ elm-test
