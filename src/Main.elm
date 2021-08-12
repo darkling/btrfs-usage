@@ -110,9 +110,15 @@ update_raid_parameter param_type text_value raid_level =
             Copies ->
                 { raid_level | c = value }
             MinStripes ->
-                { raid_level | slo = value }
+                if raid_level.shi < value then
+                    { raid_level | slo = value, shi = value }
+                else
+                    { raid_level | slo = value }
             MaxStripes ->
-                { raid_level | shi = value }
+                if raid_level.slo > value then
+                    { raid_level | slo = value, shi = value }
+                else
+                    { raid_level | shi = value }
             Parity ->
                 { raid_level | p = value }
 
