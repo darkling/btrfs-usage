@@ -128,6 +128,17 @@ suite =
                                      disks=[4, 4, 4, 4, 4]
                                    },
 
+               test "RAID-1/10 should fill almost everything" <|
+                   \_ ->
+                   let
+                       params = { c=2, slo=1, shi=2, p=0 }
+                   in
+                       upper_bound params [10, 10, 10, 10, 10]
+                   |> Expect.equal { usable=24,
+                                     stripe=4,
+                                     disks=[10, 10, 10, 9, 9]
+                                   },
+
                test "RAID-5 should allocate all the devices" <|
                    \_ ->
                    let
@@ -210,5 +221,38 @@ suite =
 
                    |> Expect.equal [{ usable=4, stripe=4, disks=[1, 1, 1, 1] },
                                     { usable=2, stripe=2, disks=[0, 0, 1, 1] }]
-             ]
+             ],
+
+             test "Should handle odd devices, variable stripes equally (equal 2 vs max 2)" <|
+                 \_ ->
+                 let
+                     params_eq2 = { c=2, slo=2, shi=2, p=0 }
+                     params_max2 = { c=2, slo=1, shi=2, p=0 }
+                     disks = [10, 10, 10, 10, 10]
+                 in
+                     Expect.equal
+                         (usage params_eq2 disks)
+                         (usage params_max2 disks),
+
+             test "Should handle odd devices, variable stripes equally (max 2 vs max 4)" <|
+                 \_ ->
+                 let
+                     params2 = { c=2, slo=1, shi=2, p=0 }
+                     params4 = { c=2, slo=1, shi=4, p=0 }
+                     disks = [10, 10, 10, 10, 10]
+                 in
+                     Expect.equal
+                         (usage params2 disks)
+                         (usage params4 disks),
+
+             test "Should handle odd devices, variable stripes equally (max 2 vs max 3)" <|
+                 \_ ->
+                 let
+                     params2 = { c=2, slo=1, shi=4, p=0 }
+                     params3 = { c=2, slo=1, shi=3, p=0 }
+                     disks = [10, 10, 10, 10, 10]
+                 in
+                     Expect.equal
+                         (usage params2 disks)
+                         (usage params3 disks)
         ]
