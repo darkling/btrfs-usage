@@ -6,6 +6,7 @@ import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
 import Html.Attributes exposing (attribute, class, type_, name, value,
                                  checked, style)
 import Html.Events exposing (onInput, onClick)
+import List.Extra
 
 main = Browser.document {
            init = init,
@@ -132,6 +133,7 @@ view model =
              div [ class "main-section" ]
                  [ h2 [] [ text "Device sizes" ],
                    view_devices model.disk_size
+                       <| usage model.raid_level model.disk_size
                  ]
             ]
     }
@@ -168,11 +170,18 @@ raid_param_line label ctrl_name param_value event =
                 ]
         ]
 
-view_devices disks =
-    table [ class "" ]
-        <| List.reverse <| List.indexedMap disk_to_device_line disks
+view_devices: List Int -> List Allocation -> Html Msg
+view_devices disks alloc =
+    let
+        per_disk_stripes = List.Extra.transpose <| List.map .disks alloc
+        items =
+            List.map2 Tuple.pair disks per_disk_stripes
+                |> List.indexedMap disk_to_device_line
+                |> List.reverse
+    in
+        table [ class "" ] items
 
-disk_to_device_line i disk =
+disk_to_device_line i (disk, stripes) =
     tr [] [ td [] [ input [ type_ "number",
                             class "disk-size",
                             name ("disk_size" ++ (String.fromInt i)),
