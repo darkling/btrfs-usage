@@ -204,11 +204,14 @@ device_usage_bar bar_scale disk stripes =
                stripes
         all_used = List.sum(stripes)
     in
-        used ++ [div [ class "usage-bar",
-                       class "empty",
-                       style "width" <| bar_size bar_scale (disk-all_used)
-                     ] []
-                ]
+        if disk > all_used then
+            used ++ [div [ class "usage-bar",
+                           class "empty",
+                           style "width" <| bar_size bar_scale (disk-all_used)
+                         ] []
+                    ]
+        else
+            used
 
 max_bar = 800
 
