@@ -26,10 +26,21 @@ input.disk-size {
     padding: 0;
     margin: 0;
     display: inline-block;
-    background: #00dd00;
 }
 .usage-bar.empty {
 	height: 8px;
 	border: solid 1px #00dd00;
-	background: #ffffff;
+	background: #ffffff !important;
+}
+.usage-bar:nth-child(4n+0) {
+	background: #00d000;
+}
+.usage-bar:nth-child(4n+1) {
+	background: #44d844;
+}
+.usage-bar:nth-child(4n+2) {
+	background: #88e088;
+}
+.usage-bar:nth-child(4n+3) {
+	background: #cce8cc;
 }
