@@ -173,15 +173,16 @@ raid_param_line label ctrl_name param_value event =
 view_devices: List Int -> List Allocation -> Html Msg
 view_devices disks alloc =
     let
+        bar_scale = Maybe.withDefault 1 <| List.maximum disks
         per_disk_stripes = List.Extra.transpose <| List.map .disks alloc
         items =
             List.map2 Tuple.pair disks per_disk_stripes
-                |> List.indexedMap disk_to_device_line
+                |> List.indexedMap (disk_to_device_line bar_scale)
                 |> List.reverse
     in
         table [ class "" ] items
 
-disk_to_device_line i (disk, stripes) =
+disk_to_device_line bar_scale i (disk, stripes) =
     tr [] [ td [] [ input [ type_ "number",
                             class "disk-size",
                             name ("disk_size" ++ (String.fromInt i)),
@@ -190,11 +191,29 @@ disk_to_device_line i (disk, stripes) =
                             onInput <| AlterDeviceSize i
                           ] []
                   ],
-            td [] [ div [ class "usage-bar",
-                          style "width" "300px"
-                        ] []
-                  ]
+            td [] <| device_usage_bar bar_scale disk stripes
           ]
+
+device_usage_bar bar_scale disk stripes =
+    let
+        used = List.map
+               (\alloc -> div [ class "usage-bar",
+                                    style "width" <| bar_size bar_scale alloc
+                              ] []
+               )
+               stripes
+        all_used = List.sum(stripes)
+    in
+        used ++ [div [ class "usage-bar",
+                       class "empty",
+                       style "width" <| bar_size bar_scale (disk-all_used)
+                     ] []
+                ]
+
+max_bar = 800
+
+bar_size scale alloc =
+    String.fromInt (alloc * max_bar // scale) ++ "px"
 
 -- Subscriptions
 

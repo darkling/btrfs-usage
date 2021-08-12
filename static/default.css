@@ -6,6 +6,9 @@ h2 {
     font-family: quicksand, sans-serif;
     font-weight: bold;
 }
+body {
+	font-family: sans-serif;
+}
 .main-section {
     padding: 10px;
     margin: 5px;
@@ -19,9 +22,14 @@ input.disk-size {
     width: 5em;
 }
 .usage-bar {
-    height: 0.4em;
+    height: 0.6em;
     padding: 0;
     margin: 0;
     display: inline-block;
     background: #00dd00;
+}
+.usage-bar.empty {
+	height: 0.6em - 2px;
+	border: solid 1px #00dd00;
+	background: #ffffff;
 }
