@@ -275,9 +275,6 @@ used_by_disk disks usage_values =
         |> List.Extra.transpose
         |> List.map List.sum
 
-rev: (a -> b -> c) -> (b -> a -> c)
-rev f = \a b -> f b a
-
 -- Subscriptions
 
 subscriptions: Model -> Sub msg
