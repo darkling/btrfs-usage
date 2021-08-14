@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space, usage, usage_ordered)
+module Main exposing (main, upper_bound, min_arg, used_space, usage)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -233,11 +233,7 @@ subscriptions model =
 -- Model
 
 usage: RaidParams -> List Int -> List Allocation
-usage params disks =
-    usage_ordered params disks
-
-usage_ordered: RaidParams -> List Int -> List Allocation
-usage_ordered params input_disks =
+usage params input_disks =
     let
         return_value = upper_bound params input_disks
         { usable, disks } = return_value
@@ -246,7 +242,7 @@ usage_ordered params input_disks =
         if usable == 0 then
             []
         else
-            return_value :: usage_ordered params reduced_disks
+            return_value :: usage params reduced_disks
 
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
