@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space, usage)
+module Main exposing (main, upper_bound, min_arg, used_space, usage, calc_unusable)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -125,6 +125,9 @@ update_raid_parameter param_type text_value raid_level =
 -- View
 
 view model =
+    let
+        usage_values = usage model.raid_level model.disk_size
+    in
     {
         title = "btrfs disk usage calculator",
         body = [
@@ -138,8 +141,8 @@ view model =
                  ],
              div [ class "main-section" ]
                  [ h2 [] [ text "Device sizes" ],
-                   view_devices model.disk_size
-                       <| usage model.raid_level model.disk_size
+                   view_devices model.disk_size usage_values,
+                   view_usage_summary model usage_values
                  ]
             ]
     }
@@ -223,6 +226,40 @@ max_bar = 800
 
 bar_size scale alloc =
     String.fromInt (alloc * max_bar // scale) ++ "px"
+
+view_usage_summary: Model -> List Allocation -> Html Msg
+view_usage_summary model usage_values =
+    let
+        usable = usage_values
+               |> List.map .usable
+               |> List.sum
+        unusable = calc_unusable model.disk_size usage_values
+    in
+        table [] [ tr [] [ td [] [ text "Total space for files:" ],
+                           td [] [ text <| String.fromInt usable ]
+                         ],
+                   tr [] [ td [] [ text "Unusable:" ],
+                           td [] [ text <| String.fromInt unusable ]
+                         ]
+                 ]
+
+calc_unusable: List Int -> List Allocation -> Int
+calc_unusable disks usage_values =
+    let
+        used = used_by_disk disks usage_values
+        free = List.map2 (-) disks used
+    in
+        List.sum free
+
+used_by_disk: List Int -> List Allocation -> List Int
+used_by_disk disks usage_values =
+    usage_values
+        |> List.map .disks
+        |> List.Extra.transpose
+        |> List.map List.sum
+
+rev: (a -> b -> c) -> (b -> a -> c)
+rev f = \a b -> f b a
 
 -- Subscriptions
 

@@ -254,5 +254,34 @@ suite =
                      Expect.equal
                          (usage params2 disks)
                          (usage params3 disks)
+             ],
+             describe "calc_unusable"
+             [ test "Should handle full disks" <|
+                   \_ ->
+                   let
+                       disks = [4, 3, 2, 1]
+                       usage = [{ usable=10, stripe=1, disks=[4, 3, 2, 1] }]
+                   in
+                       calc_unusable disks usage
+                   |> Expect.equal 0,
+
+               test "Should handle partially empty disks" <|
+                   \_ ->
+                   let
+                       disks = [4, 3, 2, 1]
+                       usage = [{ usable=7, stripe=1, disks=[2, 2, 2, 1] }]
+                   in
+                       calc_unusable disks usage
+                   |> Expect.equal 3,
+
+               test "Should handle multiple records" <|
+                   \_ ->
+                   let
+                       disks = [4, 3, 2, 1]
+                       usage = [{ usable=7, stripe=1, disks=[2, 2, 2, 1] },
+                                { usable=2, stripe=1, disks=[1, 1, 0, 0] }]
+                   in
+                       calc_unusable disks usage
+                   |> Expect.equal 1
              ]
         ]
