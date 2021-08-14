@@ -235,7 +235,7 @@ subscriptions model =
 usage: RaidParams -> List Int -> List Allocation
 usage params input_disks =
     let
-        return_value = upper_bound params input_disks
+        return_value = upper_bound_general params input_disks
         { usable, disks } = return_value
         reduced_disks = List.map2 (-) input_disks disks
     in
@@ -244,6 +244,14 @@ usage params input_disks =
         else
             return_value :: usage params reduced_disks
 
+upper_bound_general: RaidParams -> List Int -> Allocation
+upper_bound_general params disks =
+    let
+        (o_disks, disk_order) = order_disks disks
+        result = upper_bound params o_disks
+    in
+        { result | disks = unorder_disks disk_order result.disks }
+
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
     -- Returns a structure:
@@ -251,20 +259,18 @@ upper_bound params disks =
     --   stripe: number of devices allocated on each pass,
     --   disks: list of space allocated on each disk
     let
-        -- Sort the disks by size
-        (o_disks, disk_order) = order_disks disks
         -- Number of disks total
-        n_disks = List.length <| List.filter (\x -> x > 0) o_disks
+        n_disks = List.length <| List.filter (\x -> x > 0) disks
         -- Largest disk
-        max_disk = Maybe.withDefault -1 <| List.head o_disks
+        max_disk = Maybe.withDefault -1 <| List.head disks
         -- Number of devices available to use
         avail_devs = min n_disks ((params.shi+params.p)*params.c)
         -- Numer of devices actually used (round down to a multiple of copies)
         stripe = avail_devs - modBy params.c avail_devs
         -- Trivial bound
-        trivial_bound = (List.sum o_disks) // stripe
+        trivial_bound = (List.sum disks) // stripe
         -- Possible values for other bounds
-        maybe_bounds = bounds_by_disk stripe o_disks
+        maybe_bounds = bounds_by_disk stripe disks
         -- Actual bounds
         bounds = List.filter (\(i, d, b) -> d >= b) maybe_bounds
         -- Smallest upper bound
@@ -284,7 +290,7 @@ upper_bound params disks =
         else
             { usable=space_available,
               stripe=stripe,
-              disks=used_space (bd*stripe) o_disks |> unorder_disks disk_order
+              disks=used_space (bd*stripe) disks
             }
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
