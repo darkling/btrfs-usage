@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space, usage, usage_ordered, process_ordered)
+module Main exposing (main, upper_bound, min_arg, used_space, usage, usage_ordered)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -357,20 +357,6 @@ min_arg pred list =
                             Just head
                         else
                             Just min_rest
-
-process_ordered: (List a -> List b) -> (a -> comparable) -> List a -> List b
-process_ordered mapper key items =
-    let
-        enumerated_ordered = items
-                           |> List.indexedMap Tuple.pair
-                           |> List.sortBy (Tuple.second >> key)
-        order = List.map Tuple.first enumerated_ordered
-        items_ordered = List.map Tuple.second enumerated_ordered
-    in
-        mapper items_ordered
-            |> List.map2 Tuple.pair order
-            |> List.sortBy Tuple.first
-            |> List.map Tuple.second
 
 raid_presets: RaidPreset -> RaidParams
 raid_presets preset =

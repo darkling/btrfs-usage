@@ -162,23 +162,6 @@ suite =
 
                    |> Expect.equal (Just (1, "b"))
              ],
-         describe "process_ordered"
-             [ fuzz (list int)
-                   "identity transformation is an identity" <|
-                   \fuzz_list ->
-                       process_ordered identity identity fuzz_list
-                   |> Expect.equal fuzz_list,
-               fuzz (list int)
-                   "changing the ordering of the output should map unchanged" <|
-                   \fuzz_list ->
-                       process_ordered (List.map negate) identity fuzz_list
-                   |> Expect.equal (List.map negate fuzz_list),
-               fuzz (list int)
-                   "changing the key should map unchanged" <|
-                   \fuzz_list ->
-                       process_ordered identity negate fuzz_list
-                   |> Expect.equal fuzz_list
-             ],
          describe "used_space"
              [ test "Should handle an even spread of full disks" <|
                    \_ ->
