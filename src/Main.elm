@@ -234,31 +234,10 @@ subscriptions model =
 
 usage: RaidParams -> List Int -> List Allocation
 usage params disks =
-    let
-        id_map = disks
-                 |> List.indexedMap Tuple.pair
-                 |> List.sortBy (\t -> negate <| Tuple.second t)
-        perm = List.map Tuple.first id_map
-        ord_disks = List.map Tuple.second id_map
-    in
-        usage_ordered params ord_disks
-            |> List.map (reorder_disks perm)
-
-reorder_disks: List Int -> Allocation -> Allocation
-reorder_disks perm alloc =
-    { alloc |
-      disks = alloc.disks
-          |> List.map2 Tuple.pair perm
-          |> List.sort
-          |> List.map Tuple.second
-    }
+    process_ordered (usage_ordered params) negate disks
 
 usage_ordered: RaidParams -> List Int -> List Allocation
-usage_ordered params disks =
-    usage_impl params disks
-
-usage_impl: RaidParams -> List Int -> List Allocation
-usage_impl params input_disks =
+usage_ordered params input_disks =
     let
         return_value = upper_bound params input_disks
         { usable, disks } = return_value
@@ -267,7 +246,7 @@ usage_impl params input_disks =
         if usable == 0 then
             []
         else
-            return_value :: usage_impl params reduced_disks
+            return_value :: process_ordered (usage_ordered params) negate reduced_disks
 
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =

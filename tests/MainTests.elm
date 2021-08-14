@@ -23,7 +23,7 @@ suite =
                                      disks=[25, 20, 15, 10]
                                    },
 
-               test "Too few disks (RAID-1) should use no space" <|
+               test "Too few disks (RAID-1c3) should use no space" <|
                    \_ ->
                    let
                        params = { c=3, slo=1, shi=1, p=0 }
@@ -31,7 +31,7 @@ suite =
                        upper_bound params [25, 15]
 
                    |> Expect.equal { usable=0,
-                                     stripe=3,
+                                     stripe=0,
                                      disks=[0, 0]
                                    },
 
@@ -237,19 +237,8 @@ suite =
                        usage params [1, 1, 4, 2]
 
                    |> Expect.equal [{ usable=4, stripe=4, disks=[1, 1, 1, 1] },
-                                    { usable=2, stripe=2, disks=[0, 0, 1, 1] }]
+                                    { usable=2, stripe=2, disks=[1, 1, 0, 0] }]
              ],
-
-             test "Should handle odd devices, variable stripes equally (equal 2 vs max 2)" <|
-                 \_ ->
-                 let
-                     params_eq2 = { c=2, slo=2, shi=2, p=0 }
-                     params_max2 = { c=2, slo=1, shi=2, p=0 }
-                     disks = [10, 10, 10, 10, 10]
-                 in
-                     Expect.equal
-                         (usage params_eq2 disks)
-                         (usage params_max2 disks),
 
              test "Should handle odd devices, variable stripes equally (max 2 vs max 4)" <|
                  \_ ->
@@ -265,7 +254,7 @@ suite =
              test "Should handle odd devices, variable stripes equally (max 2 vs max 3)" <|
                  \_ ->
                  let
-                     params2 = { c=2, slo=1, shi=4, p=0 }
+                     params2 = { c=2, slo=1, shi=2, p=0 }
                      params3 = { c=2, slo=1, shi=3, p=0 }
                      disks = [10, 10, 10, 10, 10]
                  in
