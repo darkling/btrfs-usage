@@ -234,7 +234,7 @@ subscriptions model =
 
 usage: RaidParams -> List Int -> List Allocation
 usage params disks =
-    process_ordered (usage_ordered params) negate disks
+    usage_ordered params disks
 
 usage_ordered: RaidParams -> List Int -> List Allocation
 usage_ordered params input_disks =
@@ -246,7 +246,7 @@ usage_ordered params input_disks =
         if usable == 0 then
             []
         else
-            return_value :: process_ordered (usage_ordered params) negate reduced_disks
+            return_value :: usage_ordered params reduced_disks
 
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
@@ -254,18 +254,20 @@ upper_bound params disks =
     --   _usable_ space allocated,
     --   list of space allocated on each disk
     let
+        -- Sort the disks by size
+        (o_disks, disk_order) = order_disks disks
         -- Number of disks total
-        n_disks = List.length <| List.filter (\x -> x > 0) disks
+        n_disks = List.length <| List.filter (\x -> x > 0) o_disks
         -- Largest disk
-        max_disk = Maybe.withDefault -1 <| List.head disks
+        max_disk = Maybe.withDefault -1 <| List.head o_disks
         -- Number of devices available to use
         avail_devs = min n_disks ((params.shi+params.p)*params.c)
         -- Numer of devices actually used (round down to a multiple of copies)
         stripe = avail_devs - modBy params.c avail_devs
         -- Trivial bound
-        trivial_bound = (List.sum disks) // stripe
+        trivial_bound = (List.sum o_disks) // stripe
         -- Possible values for other bounds
-        maybe_bounds = bounds_by_disk stripe disks
+        maybe_bounds = bounds_by_disk stripe o_disks
         -- Actual bounds
         bounds = List.filter (\(i, d, b) -> d >= b) maybe_bounds
         -- Smallest upper bound
@@ -285,7 +287,7 @@ upper_bound params disks =
         else
             { usable=space_available,
               stripe=stripe,
-              disks=used_space (bd*stripe) disks
+              disks=used_space (bd*stripe) o_disks |> unorder_disks disk_order
             }
 
 bounds_by_disk: Int -> List Int -> List (Int, Int, Int)
@@ -322,6 +324,20 @@ used_space_fold (i, disk) (res, remaining) =
         (this_fill :: res,
          remaining - this_fill
         )
+
+order_disks disks =
+    let
+        enum_items = disks
+              |> List.indexedMap Tuple.pair
+              |> List.sortBy (Tuple.second >> negate)
+    in
+        (List.map Tuple.second enum_items,
+         List.map Tuple.first enum_items)
+
+unorder_disks orig_order disks =
+    List.map2 Tuple.pair orig_order disks
+        |> List.sortBy Tuple.first
+        |> List.map Tuple.second
 
 min_arg: (a -> Int) -> List a -> Maybe a
 min_arg pred list =

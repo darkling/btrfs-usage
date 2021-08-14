@@ -237,8 +237,19 @@ suite =
                        usage params [1, 1, 4, 2]
 
                    |> Expect.equal [{ usable=4, stripe=4, disks=[1, 1, 1, 1] },
-                                    { usable=2, stripe=2, disks=[1, 1, 0, 0] }]
+                                    { usable=2, stripe=2, disks=[0, 0, 1, 1] }]
              ],
+
+             test "Should work with unordered lists (part 2)" <|
+                 \_ ->
+                 let
+                     params = { c=2, slo=1, shi=1, p=0 }
+                     disks = [1000, 1000, 1000, 1000, 4000]
+                 in
+                     usage params disks
+                 |> Expect.equal [{ usable=4000,
+                                    stripe=2,
+                                    disks=[1000, 1000, 1000, 1000, 4000]} ],
 
              test "Should handle odd devices, variable stripes equally (max 2 vs max 4)" <|
                  \_ ->
