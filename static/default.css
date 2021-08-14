@@ -32,15 +32,15 @@ input.disk-size {
 	border: solid 1px #00dd00;
 	background: #ffffff !important;
 }
-.usage-bar:nth-child(4n+0) {
+.usage-bar:nth-child(4n+1) {
 	background: #00d000;
 }
-.usage-bar:nth-child(4n+1) {
+.usage-bar:nth-child(4n+2) {
 	background: #44d844;
 }
-.usage-bar:nth-child(4n+2) {
+.usage-bar:nth-child(4n+3) {
 	background: #88e088;
 }
-.usage-bar:nth-child(4n+3) {
+.usage-bar:nth-child(4n+4) {
 	background: #cce8cc;
 }
