@@ -7,6 +7,12 @@
   <script src="elm.js"></script>
 </head>
 <body>
-  <script>var app = Elm.Main.init();</script>
+  <script>
+    var app = Elm.Main.init();
+    app.ports.pushUrl.subscribe(function(url) {
+        history.pushState({}, '', url);
+        //app.ports.onUrlChange.send(location.href);
+    });
+  </script>
 </body>
 </html>

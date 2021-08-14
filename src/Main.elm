@@ -1,4 +1,4 @@
-module Main exposing (main, upper_bound, min_arg, used_space, usage, calc_unusable)
+port module Main exposing (main, upper_bound, min_arg, used_space, usage, calc_unusable)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -7,6 +7,7 @@ import Html.Attributes exposing (attribute, class, type_, name, value,
                                  checked, style)
 import Html.Events exposing (onInput, onClick)
 import List.Extra
+import Url.Builder as UB
 
 main = Browser.document {
            init = init,
@@ -42,6 +43,8 @@ type alias Allocation = {
         disks: List Int
     }
 
+port pushUrl: String -> Cmd msg
+
 init: () -> (Model, Cmd Msg)
 init _ = (
           {
@@ -57,16 +60,21 @@ update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         AlterDeviceCount value ->
-            ({model | disk_size = update_disk_list value model.disk_size},
-             Cmd.none)
+            let
+                new_model = {model | disk_size = update_disk_list value model.disk_size}
+            in
+                (new_model, pushUrl <| build_url new_model)
         AlterDeviceSize dev value ->
-            ({model | disk_size = update_disk_size dev value model.disk_size},
-             Cmd.none)
+            let
+                new_model = {model | disk_size = update_disk_size dev value model.disk_size}
+            in
+                (new_model, pushUrl <| build_url new_model)
         AlterRaidParam which value ->
             let
                 raid_level = update_raid_parameter which value model.raid_level
+                new_model = {model | raid_level = raid_level}
             in
-                ({model | raid_level = raid_level}, Cmd.none)
+                (new_model, pushUrl <| build_url new_model)
 
 update_disk_list: String -> List Int -> List Int
 update_disk_list text_value disks =
@@ -121,6 +129,15 @@ update_raid_parameter param_type text_value raid_level =
                     { raid_level | shi = value }
             Parity ->
                 { raid_level | p = value }
+
+
+build_url model =
+    UB.relative [] <| [ UB.int "c" model.raid_level.c,
+                        UB.int "slo" model.raid_level.slo,
+                        UB.int "shi" model.raid_level.shi,
+                        UB.int "p" model.raid_level.p,
+                        UB.int "n" <| List.length model.disk_size
+                      ] ++ (List.map (UB.int "d") model.disk_size)
 
 -- View
 
