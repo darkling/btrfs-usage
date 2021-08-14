@@ -220,8 +220,7 @@ suite =
                        usage params [1, 1, 4, 2]
 
                    |> Expect.equal [{ usable=4, stripe=4, disks=[1, 1, 1, 1] },
-                                    { usable=2, stripe=2, disks=[0, 0, 1, 1] }]
-             ],
+                                    { usable=2, stripe=2, disks=[0, 0, 1, 1] }],
 
              test "Should work with unordered lists (part 2)" <|
                  \_ ->
@@ -255,4 +254,5 @@ suite =
                      Expect.equal
                          (usage params2 disks)
                          (usage params3 disks)
+             ]
         ]
