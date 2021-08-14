@@ -250,9 +250,10 @@ usage_ordered params input_disks =
 
 upper_bound: RaidParams -> List Int -> Allocation
 upper_bound params disks =
-    -- Returns a 2-tuple:
-    --   _usable_ space allocated,
-    --   list of space allocated on each disk
+    -- Returns a structure:
+    --   usable: usable space allocated,
+    --   stripe: number of devices allocated on each pass,
+    --   disks: list of space allocated on each disk
     let
         -- Sort the disks by size
         (o_disks, disk_order) = order_disks disks
