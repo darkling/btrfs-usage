@@ -280,7 +280,7 @@ upper_bound params disks =
         -- Largest disk
         max_disk = Maybe.withDefault -1 <| List.head disks
         -- Number of devices available to use
-        avail_devs = min n_disks (params.shi+params.p)*params.c
+        avail_devs = min n_disks ((params.shi+params.p)*params.c)
         -- Numer of devices actually used (round down to a multiple of copies)
         stripe = avail_devs - modBy params.c avail_devs
         -- Trivial bound
