@@ -7,7 +7,11 @@ import Html.Attributes exposing (attribute, class, type_, name, value,
                                  checked, style)
 import Html.Events exposing (onInput, onClick)
 import List.Extra
+import Url
 import Url.Builder as UB
+import Url.Parser exposing ((<?>))
+import Url.Parser as UP
+import Url.Parser.Query as UPQ
 
 main = Browser.document {
            init = init,
@@ -19,6 +23,7 @@ main = Browser.document {
 type Msg = AlterDeviceCount String
          | AlterDeviceSize Int String
          | AlterRaidParam RaidParamType String
+         | UrlChanged Model
 
 type RaidPreset = Single
                 | RAID0
@@ -44,6 +49,7 @@ type alias Allocation = {
     }
 
 port pushUrl: String -> Cmd msg
+port onUrlChange: (String -> msg) -> Sub msg
 
 init: () -> (Model, Cmd Msg)
 init _ = (
@@ -75,6 +81,8 @@ update msg model =
                 new_model = {model | raid_level = raid_level}
             in
                 (new_model, pushUrl <| build_url new_model)
+        UrlChanged new_model ->
+            (new_model, Cmd.none)
 
 update_disk_list: String -> List Int -> List Int
 update_disk_list text_value disks =
@@ -135,8 +143,7 @@ build_url model =
     UB.relative [] <| [ UB.int "c" model.raid_level.c,
                         UB.int "slo" model.raid_level.slo,
                         UB.int "shi" model.raid_level.shi,
-                        UB.int "p" model.raid_level.p,
-                        UB.int "n" <| List.length model.disk_size
+                        UB.int "p" model.raid_level.p
                       ] ++ (List.map (UB.int "d") model.disk_size)
 
 -- View
@@ -277,9 +284,41 @@ used_by_disk disks usage_values =
 
 -- Subscriptions
 
-subscriptions: Model -> Sub msg
+subscriptions: Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    onUrlChange (location_to_model >> UrlChanged)
+
+location_to_model location =
+    case Url.fromString location of
+        Nothing ->
+            let _ = Debug.log "bad url parse" location
+            in Tuple.first <| init ()
+        Just url ->
+            case UP.parse query_to_model url of
+                Nothing ->
+                    Debug.log "bad query parse" <| Tuple.first <| init ()
+                Just model ->
+                    Debug.log "good query parse" <| model
+
+query_to_model =
+    UP.query <| UPQ.map2 Model query_to_disks query_to_params
+
+query_to_params =
+    UPQ.map4 RaidParams
+        (UPQ.map (Maybe.withDefault 1) (UPQ.int "c"))
+        (UPQ.map (Maybe.withDefault 1) (UPQ.int "slo"))
+        (UPQ.map (Maybe.withDefault 1) (UPQ.int "shi"))
+        (UPQ.map (Maybe.withDefault 0) (UPQ.int "p"))
+
+query_to_disks =
+    UPQ.custom "d"
+        (List.map String.toInt
+             >> List.filter (\x -> case x of
+                                       Nothing -> False
+                                       Just _ -> True)
+             >> List.map (\x -> case x of
+                                    Nothing -> Debug.todo "should never happen"
+                                    Just v -> v))
 
 -- Model
 

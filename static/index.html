@@ -9,10 +9,16 @@
 <body>
   <script>
     var app = Elm.Main.init();
+
     app.ports.pushUrl.subscribe(function(url) {
         history.pushState({}, '', url);
-        //app.ports.onUrlChange.send(location.href);
     });
+
+    window.addEventListener('popstate', function () {
+	app.ports.onUrlChange.send(location.href);
+    });
+
+    app.ports.onUrlChange.send(location.href);
   </script>
 </body>
 </html>
