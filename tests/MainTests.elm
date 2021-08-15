@@ -255,7 +255,7 @@ suite =
                          (usage params2 disks)
                          (usage params3 disks)
              ],
-             describe "calc_unusable"
+         describe "calc_unusable"
              [ test "Should handle full disks" <|
                    \_ ->
                    let
@@ -283,5 +283,34 @@ suite =
                    in
                        calc_unusable disks usage
                    |> Expect.equal 1
+             ],
+         describe "url parsing"
+             [ test "Should parse a full URL with no path" <|
+                   \_ ->
+                   let
+                       url = "https://localhost/?c=1&slo=1&shi=4&p=1&d=1000"
+                   in
+                       location_to_model url
+                   |> Expect.equal { disk_size=[1000],
+                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                   },
+               test "Should parse a full URL with a one-element path" <|
+                   \_ ->
+                   let
+                       url = "https://localhost/here/?c=1&slo=1&shi=4&p=1&d=1000"
+                   in
+                       location_to_model url
+                   |> Expect.equal { disk_size=[1000],
+                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                   },
+               test "Should parse a full URL with a two-element path" <|
+                   \_ ->
+                   let
+                       url = "https://localhost/here/there/?c=1&slo=1&shi=4&p=1&d=1000"
+                   in
+                       location_to_model url
+                   |> Expect.equal { disk_size=[1000],
+                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                   }
              ]
         ]

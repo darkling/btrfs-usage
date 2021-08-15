@@ -1,4 +1,5 @@
-port module Main exposing (main, upper_bound, min_arg, used_space, usage, calc_unusable)
+port module Main exposing (main, upper_bound, min_arg, used_space, usage,
+                           calc_unusable, location_to_model)
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
@@ -334,19 +335,19 @@ subscriptions model =
     onUrlChange (location_to_model >> UrlChanged)
 
 location_to_model location =
-    case Url.fromString location of
-        Nothing ->
-            Tuple.first <| init ()
-        Just url ->
-            case UP.parse query_to_model url of
-                Nothing ->
-                    Tuple.first <| init ()
-                Just model ->
-                    model
+    let
+        raw_url = Url.fromString location
+        url = Maybe.andThen (\u -> Just { u | path = "" }) raw_url
+    in
+        case Maybe.andThen (UP.parse query_to_model) url of
+            Nothing ->
+                Tuple.first <| init ()
+            Just model ->
+                model
 
 query_to_model =
-    UP.map (\_ q -> q)
-        (UP.string <?> UPQ.map2 Model query_to_disks query_to_params)
+    UP.query
+        <| UPQ.map2 Model query_to_disks query_to_params
 
 query_to_params =
     UPQ.map4 RaidParams
