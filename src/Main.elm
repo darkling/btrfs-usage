@@ -275,7 +275,7 @@ device_usage_bar bar_scale disk stripes =
     let
         used = List.map
                (\alloc -> div [ class "usage-bar",
-                                    style "width" <| bar_size bar_scale alloc
+                                style "width" <| bar_size bar_scale alloc
                               ] []
                )
                stripes
