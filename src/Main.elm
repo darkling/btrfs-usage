@@ -168,10 +168,11 @@ view model =
                  [ h2 []  [ text "RAID levels" ],
                    div [ class "float-right" ]
                        <| view_raid_presets
-                           model.raid_level
-                           (List.length model.disk_size),
+                              model.raid_level
+                              (List.length model.disk_size),
                    div [ class "raid-params" ]
-                       [ view_raid_params model.raid_level ]
+                       [ view_raid_params model.raid_level ],
+                   div [ style "clear" "both" ] []
                  ],
              div [ class "main-section" ]
                  [ h2 [] [ text "Device sizes" ],
