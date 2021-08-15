@@ -23,6 +23,7 @@ main = Browser.document {
 type Msg = AlterDeviceCount String
          | AlterDeviceSize Int String
          | AlterRaidParam RaidParamType String
+         | SetRaidPreset RaidPreset
          | UrlChanged Model
 
 type RaidPreset = Single
@@ -79,6 +80,11 @@ update msg model =
             let
                 raid_level = update_raid_parameter which value model.raid_level
                 new_model = {model | raid_level = raid_level}
+            in
+                (new_model, pushUrl <| build_url new_model)
+        SetRaidPreset preset ->
+            let
+                new_model = {model | raid_level = raid_preset preset}
             in
                 (new_model, pushUrl <| build_url new_model)
         UrlChanged new_model ->
@@ -228,7 +234,8 @@ raid_preset_line cur_level n preset =
                   name "raid-preset",
                   checked (Debug.log "is level" <| is_raid_level cur_level n (raid_preset preset)),
                   value text_name,
-                  id text_name
+                  id text_name,
+                  onClick <| SetRaidPreset preset
                 ] [],
           label [ for text_name ] [ text text_name ],
           br [] []
