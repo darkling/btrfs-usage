@@ -2,9 +2,9 @@ port module Main exposing (main, upper_bound, min_arg, used_space, usage, calc_u
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
-                      table, tr, td)
+                      table, tr, td, a)
 import Html.Attributes exposing (attribute, class, type_, name, value,
-                                 checked, style)
+                                 checked, style, href)
 import Html.Events exposing (onInput, onClick)
 import List.Extra
 import Url
@@ -167,6 +167,14 @@ view model =
                  [ h2 [] [ text "Device sizes" ],
                    view_devices model.disk_size usage_values,
                    view_usage_summary model usage_values
+                 ],
+             div [ class "main-section" ]
+                 [ text "This is a beta release. Please report any bugs found to the ",
+                   a [ href "https://github.com/darkling/btrfs-usage/issues" ]
+                     [ text "issue tracker" ],
+                   text ". The ",
+                   a [ href "/btrfs-usage-old/" ] [ text "old version" ],
+                   text " is still available."
                  ]
             ]
     }
