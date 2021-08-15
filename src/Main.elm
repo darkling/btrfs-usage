@@ -232,7 +232,7 @@ raid_preset_line cur_level n preset =
     in
         [ input [ type_ "radio",
                   name "raid-preset",
-                  checked (Debug.log "is level" <| is_raid_level cur_level n (raid_preset preset)),
+                  checked (is_raid_level cur_level n (raid_preset preset)),
                   value text_name,
                   id text_name,
                   onClick <| SetRaidPreset preset
