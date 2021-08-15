@@ -299,17 +299,17 @@ subscriptions model =
 location_to_model location =
     case Url.fromString location of
         Nothing ->
-            let _ = Debug.log "bad url parse" location
-            in Tuple.first <| init ()
+            Tuple.first <| init ()
         Just url ->
             case UP.parse query_to_model url of
                 Nothing ->
-                    Debug.log "bad query parse" <| Tuple.first <| init ()
+                    Tuple.first <| init ()
                 Just model ->
-                    Debug.log "good query parse" <| model
+                    model
 
 query_to_model =
-    UP.query <| UPQ.map2 Model query_to_disks query_to_params
+    UP.map (\_ q -> q)
+        (UP.string <?> UPQ.map2 Model query_to_disks query_to_params)
 
 query_to_params =
     UPQ.map4 RaidParams
