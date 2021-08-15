@@ -4,7 +4,7 @@ import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
                       table, tr, td, a)
 import Html.Attributes exposing (attribute, class, type_, name, value,
-                                 checked, style, href)
+                                 checked, style, href, id, for)
 import Html.Events exposing (onInput, onClick)
 import List.Extra
 import Url
@@ -160,6 +160,10 @@ view model =
                  <| view_num_devices model.disk_size,
              div [ class "main-section" ]
                  [ h2 []  [ text "RAID levels" ],
+                   div [ class "float-right" ]
+                       <| view_raid_presets
+                           model.raid_level
+                           (List.length model.disk_size),
                    div [ class "raid-params" ]
                        [ view_raid_params model.raid_level ]
                  ],
@@ -210,6 +214,31 @@ raid_param_line label ctrl_name param_value event =
                         ] []
                 ]
         ]
+
+view_raid_presets cur_level n =
+    [Single, RAID0, RAID1, RAID1c3, RAID1c4, RAID10, RAID5, RAID6]
+        |> List.map (raid_preset_line cur_level n)
+        |> List.concat
+
+raid_preset_line cur_level n preset =
+    let
+        text_name = raid_name preset
+    in
+        [ input [ type_ "radio",
+                  name "raid-preset",
+                  checked (Debug.log "is level" <| is_raid_level cur_level n (raid_preset preset)),
+                  value text_name,
+                  id text_name
+                ] [],
+          label [ for text_name ] [ text text_name ],
+          br [] []
+        ]
+
+is_raid_level cur_level n that_level =
+    cur_level.c == that_level.c
+        && cur_level.p == that_level.p
+        && cur_level.slo == that_level.slo
+        && cur_level.shi == that_level.shi
 
 view_devices: List Int -> List Allocation -> Html Msg
 view_devices disks alloc =
@@ -459,8 +488,8 @@ min_arg pred list =
                         else
                             Just min_rest
 
-raid_presets: RaidPreset -> RaidParams
-raid_presets preset =
+raid_preset: RaidPreset -> RaidParams
+raid_preset preset =
     case preset of
         Single  -> { c=1, slo=1, shi=1,   p=0 }
         RAID0   -> { c=1, slo=2, shi=100, p=0 }
@@ -470,3 +499,15 @@ raid_presets preset =
         RAID10  -> { c=2, slo=2, shi=100, p=0 }
         RAID5   -> { c=1, slo=1, shi=100, p=1 }
         RAID6   -> { c=1, slo=1, shi=100, p=2 }
+
+raid_name: RaidPreset -> String
+raid_name preset =
+    case preset of
+        Single  -> "Single"
+        RAID0   -> "RAID0"
+        RAID1   -> "RAID1"
+        RAID1c3 -> "RAID1c3"
+        RAID1c4 -> "RAID1c4"
+        RAID10  -> "RAID10"
+        RAID5   -> "RAID5"
+        RAID6   -> "RAID6"

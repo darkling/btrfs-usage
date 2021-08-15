@@ -21,6 +21,9 @@ input {
 input.disk-size {
     width: 5em;
 }
+.float-right {
+	float: right;
+}
 .usage-bar {
     height: 10px;
     padding: 0;
