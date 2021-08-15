@@ -18,14 +18,23 @@ To build, simply:
 ```
 
 Unit tests are provided with
-[elm-test](https://github.com/elm-explorations/test):
+[elm-test](https://github.com/elm-explorations/test); use one of the
+following:
 
 ```sh
  $ elm-test
+ $ elm-test --watch
+ $ make test
+ $ make test-watch
 ```
 
 Deployment is then a matter of copying the contents of the
-`./build/assets` directory into a web server.
+`./build/assets` directory into a web server. For testing purposes,
+a local webserver can be started with:
+
+```sh
+ $ make webserver
+```
 
 License
 =======
