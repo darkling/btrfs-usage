@@ -3,7 +3,7 @@ port module Main exposing (main, upper_bound, min_arg, used_space, usage,
 
 import Browser
 import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
-                      table, tr, td, a)
+                      table, tr, th, td, a, p)
 import Html.Attributes exposing (attribute, class, type_, name, value,
                                  checked, style, href, id, for)
 import Html.Events exposing (onInput, onClick)
@@ -178,7 +178,8 @@ view model =
              div [ class "main-section" ]
                  [ h2 [] [ text "Device sizes" ],
                    view_devices model.disk_size usage_values,
-                   view_usage_summary model usage_values
+                   view_usage_summary model usage_values,
+                   view_stripe_key model.disk_size usage_values
                  ],
              div [ class "main-section" ]
                  [ text "This is a beta release. Please report any bugs found to the ",
@@ -327,6 +328,29 @@ used_by_disk disks usage_values =
         |> List.map .disks
         |> List.Extra.transpose
         |> List.map List.sum
+
+view_stripe_key: List Int -> List Allocation -> Html Msg
+view_stripe_key disks usage_values =
+    let
+        table_body = List.indexedMap stripe_key_column usage_values
+        row_heads = [ th [ class "top-left-table" ] [ text "" ],
+                      th [] [ text "Usable" ],
+                      th [] [ text "Disks/alloc" ]
+                    ]
+        table_data = List.Extra.transpose (row_heads :: table_body)
+    in
+        table [ class "summary-table" ] <| List.map (tr []) table_data
+
+stripe_key_column i { usable, stripe, disks } =
+    let
+        itxt = String.fromInt i
+        stxt = String.fromInt <| modBy 4 i
+        cls = class <| "stripe-" ++ stxt
+    in
+        [ th [ cls ] [ text <| "region " ++ itxt ],
+          td [ cls ] [ text <| String.fromInt usable ],
+          td [ cls ] [ text <| String.fromInt stripe ]
+        ]
 
 -- Subscriptions
 

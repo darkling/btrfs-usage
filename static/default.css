@@ -32,18 +32,35 @@ input.disk-size {
 }
 .usage-bar.empty {
 	height: 8px;
-	border: solid 1px #00dd00;
+	border: solid 1px #006600;
 	background: #ffffff !important;
 }
-.usage-bar:nth-child(4n+1) {
-	background: #00d000;
+.usage-bar:nth-child(4n+1), .stripe-0 {
+	background: #00dd00;
 }
-.usage-bar:nth-child(4n+2) {
-	background: #44d844;
+.usage-bar:nth-child(4n+2), .stripe-1 {
+	background: #aaaa00;
 }
-.usage-bar:nth-child(4n+3) {
-	background: #88e088;
+.usage-bar:nth-child(4n+3), .stripe-2 {
+	background: #00aaaa;
 }
-.usage-bar:nth-child(4n+4) {
-	background: #cce8cc;
+.usage-bar:nth-child(4n+4), .stripe-3 {
+	background: #888800;
+}
+
+.summary-table {
+	margin: 2ex;
+	border-collapse: collapse;
+	text-align: right;
+}
+.summary-table .top-left-table {
+	border: none;
+}
+.summary-table td, .summary-table th {
+	border: 1px black solid;
+	padding: 2px 10px;
+	font-weight: normal;
+}
+.summary-table th {
+	text-align: left;
 }
