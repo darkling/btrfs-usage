@@ -310,12 +310,13 @@ view_usage_summary model usage_values =
                |> List.map .usable
                |> List.sum
         unusable = calc_unusable model.disk_size usage_values
+        ra = class "right-align"
     in
         table [] [ tr [] [ td [] [ text "Total space for files:" ],
-                           td [] [ text <| String.fromInt usable ]
+                           td [ ra ] [ text <| String.fromInt usable ]
                          ],
                    tr [] [ td [] [ text "Unusable:" ],
-                           td [] [ text <| String.fromInt unusable ]
+                           td [ ra ] [ text <| String.fromInt unusable ]
                          ]
                  ]
 

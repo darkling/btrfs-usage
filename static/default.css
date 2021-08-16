@@ -64,3 +64,6 @@ input.disk-size {
 .summary-table th {
 	text-align: left;
 }
+.right-align {
+	text-align: right;
+}
