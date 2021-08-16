@@ -306,6 +306,7 @@ bar_size scale alloc =
 view_usage_summary: Model -> List Allocation -> Html Msg
 view_usage_summary model usage_values =
     let
+        raw_space = List.sum model.disk_size
         usable = usage_values
                |> List.map .usable
                |> List.sum
@@ -314,6 +315,9 @@ view_usage_summary model usage_values =
     in
         table [] [ tr [] [ td [] [ text "Total space for files:" ],
                            td [ ra ] [ text <| String.fromInt usable ]
+                         ],
+                   tr [] [ td [] [ text "Total raw disk space:" ],
+                           td [ ra ] [ text <| String.fromInt raw_space ]
                          ],
                    tr [] [ td [] [ text "Unusable:" ],
                            td [ ra ] [ text <| String.fromInt unusable ]
