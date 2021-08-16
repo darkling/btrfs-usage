@@ -182,12 +182,17 @@ view model =
                    view_stripe_key model.disk_size usage_values
                  ],
              div [ class "main-section" ]
-                 [ text "This is a beta release. Please report any bugs found to the ",
-                   a [ href "https://github.com/darkling/btrfs-usage/issues" ]
-                     [ text "issue tracker" ],
-                   text ". The ",
-                   a [ href "/btrfs-usage-old/" ] [ text "old version" ],
-                   text " is still available."
+                 [ p [] [
+                       text "The results shown here do not take account of the space used by metadata, and are therefore approximate."
+                       ],
+                   p [] [
+                       text "This is a beta release. Please report any bugs found to the ",
+                       a [ href "https://github.com/darkling/btrfs-usage/issues" ]
+                       [ text "issue tracker" ],
+                       text ". The ",
+                       a [ href "/btrfs-usage-old/" ] [ text "old version" ],
+                       text " is still available."
+                       ]
                  ]
             ]
     }
