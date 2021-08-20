@@ -67,3 +67,6 @@ input.disk-size {
 .right-align {
 	text-align: right;
 }
+.full-width {
+	width: 100%;
+}

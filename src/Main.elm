@@ -281,7 +281,7 @@ disk_to_device_line bar_scale i (disk, stripes) =
                             onInput <| AlterDeviceSize i
                           ] []
                   ],
-            td [] <| device_usage_bar bar_scale disk stripes
+            td [ class "full-width" ] <| device_usage_bar bar_scale disk stripes
           ]
 
 device_usage_bar bar_scale disk stripes =
@@ -303,10 +303,10 @@ device_usage_bar bar_scale disk stripes =
         else
             used
 
-max_bar = 800
+max_bar = 100
 
 bar_size scale alloc =
-    String.fromInt (alloc * max_bar // scale) ++ "px"
+    String.fromInt (alloc * max_bar // scale) ++ "%"
 
 view_usage_summary: Model -> List Allocation -> Html Msg
 view_usage_summary model usage_values =
