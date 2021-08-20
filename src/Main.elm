@@ -201,7 +201,7 @@ view_num_devices disks =
     [ label [ attribute "for" "num_disks" ] [ text "Number of devices: " ],
       input [ type_ "number",
               name "num_disks",
-              attribute "min" "0",
+              attribute "min" "1",
               attribute "max" "100",
               value <| String.fromInt <| List.length disks,
               onInput AlterDeviceCount
@@ -377,7 +377,10 @@ location_to_model location =
             Nothing ->
                 Tuple.first <| init ()
             Just model ->
-                model
+                if model.disk_size == [] then
+                    { model | disk_size = [1000] }
+                else
+                    model
 
 query_to_model =
     UP.query
