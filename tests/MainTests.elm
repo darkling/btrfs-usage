@@ -253,7 +253,16 @@ suite =
                  in
                      Expect.equal
                          (usage params2 disks)
-                         (usage params3 disks)
+                         (usage params3 disks),
+
+             test "Should handle wider stripe than devices" <|
+                 \_ ->
+                 let
+                     params = { c=4, slo=2, shi=2, p=0 }
+                     disks = [10, 10, 10]
+                 in
+                     usage params disks
+                 |> Expect.equal []
              ],
          describe "calc_unusable"
              [ test "Should handle full disks" <|

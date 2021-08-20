@@ -259,13 +259,18 @@ view_devices: List Int -> List Allocation -> Html Msg
 view_devices disks alloc =
     let
         bar_scale = Maybe.withDefault 1 <| List.maximum disks
-        per_disk_stripes = List.Extra.transpose <| List.map .disks alloc
+        per_disk_stripes =
+            case alloc of
+                [] ->
+                    List.repeat (List.length disks) []
+                a ->
+                    List.Extra.transpose <| List.map .disks a
         items =
             List.map2 Tuple.pair disks per_disk_stripes
                 |> List.indexedMap (disk_to_device_line bar_scale)
                 |> List.reverse
     in
-        table [ class "" ] items
+        table [] items
 
 disk_to_device_line bar_scale i (disk, stripes) =
     tr [] [ td [] [ input [ type_ "number",
