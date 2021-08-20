@@ -258,7 +258,7 @@ is_raid_level cur_level n that_level =
 view_devices: List Int -> List Allocation -> Html Msg
 view_devices disks alloc =
     let
-        bar_scale = Maybe.withDefault 1 <| List.maximum disks
+        bar_scale = toFloat <| Maybe.withDefault 1 <| List.maximum disks
         per_disk_stripes =
             case alloc of
                 [] ->
@@ -303,10 +303,10 @@ device_usage_bar bar_scale disk stripes =
         else
             used
 
-max_bar = 100
+max_bar = 99
 
 bar_size scale alloc =
-    String.fromInt (alloc * max_bar // scale) ++ "%"
+    String.fromFloat ((toFloat (alloc * max_bar)) / scale) ++ "%"
 
 view_usage_summary: Model -> List Allocation -> Html Msg
 view_usage_summary model usage_values =
