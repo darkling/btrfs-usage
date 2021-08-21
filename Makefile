@@ -1,7 +1,7 @@
 TGT_DIR := build/assets/
 
 ELM_SOURCE_FILES := $(wildcard src/*.elm)
-STATIC_FILES := $(wildcard static/*.html static/*.css)
+STATIC_FILES := $(wildcard static/*.html static/*.css static/*.ttf)
 
 STATIC_TARGET := $(addprefix $(TGT_DIR),$(subst static/,,$(STATIC_FILES)))
 DOC_TARGET := doc/theory.pdf
