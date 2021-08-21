@@ -41,3 +41,6 @@ License
 
 Licensed under the 3-clause BSD license. See the file `LICENSE` for more
 details.
+
+Parts of this software are licensed under the SIL Open Font License
+1.1 (OFL). See the file `OFL.txt` for the text.
