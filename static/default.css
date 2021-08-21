@@ -3,7 +3,7 @@ html, body {
     padding: 0;
 }
 h1 {
-	font-family: quicksand, sans-serif;
+	font-family: 'Quicksand', sans-serif;
 	font-weight: bold;
 	margin-top: 0.5ex;
 	margin-bottom: 1ex;
@@ -11,13 +11,13 @@ h1 {
 	padding-right: 10px;
 }
 h2 {
-    font-family: quicksand, sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-weight: bold;
 	margin-top: 0.3ex;
 	margin-bottom: 0.8ex;
 }
 body {
-	font-family: sans-serif;
+	font-family: 'Quicksand', sans-serif;
 }
 .main-section {
     padding: 10px;
