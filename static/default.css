@@ -1,8 +1,14 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
 h1 {
-    font-family: quicksand, sans-serif;
-    font-weight: bold;
+	font-family: quicksand, sans-serif;
+	font-weight: bold;
 	margin-top: 0.5ex;
 	margin-bottom: 1ex;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 h2 {
     font-family: quicksand, sans-serif;
