@@ -6,7 +6,7 @@ import Html exposing (Html, h1, h2, button, div, span, text, label, input, br,
                       table, tr, th, td, a, p)
 import Html.Attributes exposing (attribute, class, type_, name, value,
                                  checked, style, href, id, for)
-import Html.Events exposing (onInput, onClick)
+import Html.Events exposing (onInput, onClick, onCheck)
 import List.Extra
 import Url
 import Url.Builder as UB
@@ -25,14 +25,17 @@ type Msg = AlterDeviceCount String
          | AlterDeviceSize Int String
          | AlterRaidParam RaidParamType String
          | SetRaidPreset RaidPreset
+         | SetDegenKernel Bool
          | UrlChanged Model
 
 type RaidPreset = Single
                 | RAID0
+                | RAID0d
                 | RAID1
                 | RAID1c3
                 | RAID1c4
                 | RAID10
+                | RAID10d
                 | RAID5
                 | RAID6
 
@@ -41,7 +44,8 @@ type alias RaidParams = { c: Int, slo: Int, shi: Int, p: Int }
 
 type alias Model = {
         disk_size: List Int,
-        raid_level: RaidParams
+        raid_level: RaidParams,
+        degen_kernel: Bool
     }
 
 type alias Allocation = {
@@ -57,13 +61,14 @@ init: () -> (Model, Cmd Msg)
 init _ = (
           {
               disk_size = [ 1000 ],
-              raid_level = { c=1, slo=1, shi=1, p=0 }
+              raid_level = { c=1, slo=1, shi=1, p=0 },
+              degen_kernel = True
           },
           Cmd.none
          )
 
 -- Update
-    
+
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
@@ -86,6 +91,11 @@ update msg model =
         SetRaidPreset preset ->
             let
                 new_model = {model | raid_level = raid_preset preset}
+            in
+                (new_model, pushUrl <| build_url new_model)
+        SetDegenKernel value ->
+            let
+                new_model = {model | degen_kernel = value}
             in
                 (new_model, pushUrl <| build_url new_model)
         UrlChanged new_model ->
@@ -150,7 +160,8 @@ build_url model =
     UB.relative [] <| [ UB.int "c" model.raid_level.c,
                         UB.int "slo" model.raid_level.slo,
                         UB.int "shi" model.raid_level.shi,
-                        UB.int "p" model.raid_level.p
+                        UB.int "p" model.raid_level.p,
+                        UB.int "dg" (if model.degen_kernel then 1 else 0)
                       ] ++ (List.map (UB.int "d") model.disk_size)
 
 -- View
@@ -171,6 +182,7 @@ view model =
                        [ div [ class "raid-params" ]
                              <| view_raid_presets
                                   model.raid_level
+                                  model.degen_kernel
                                   (List.length model.disk_size),
                          div [ class "detailed-params" ]
                          [ view_raid_params model.raid_level ],
@@ -229,8 +241,24 @@ raid_param_line label ctrl_name param_value event =
                 ]
         ]
 
-view_raid_presets cur_level n =
-    [Single, RAID0, RAID1, RAID1c3, RAID1c4, RAID10, RAID5, RAID6]
+view_raid_presets cur_level degen n =
+    (view_raid_presets_list cur_level degen n)
+        ++ [ input [ type_ "checkbox",
+                     name "degen_kernel",
+                     value <| string_from_bool degen,
+                     onCheck SetDegenKernel
+                   ] [],
+             text "Kernel 5.15 or later"
+           ]
+
+view_raid_presets_list cur_level degen n =
+    let
+        items =
+            case degen of
+                False -> [Single, RAID0, RAID1, RAID1c3, RAID1c4, RAID10, RAID5, RAID6]
+                True -> [Single, RAID0d, RAID1, RAID1c3, RAID1c4, RAID10d, RAID5, RAID6]
+    in
+        items
         |> List.map (raid_preset_line cur_level n)
         |> List.concat
 
@@ -389,7 +417,7 @@ location_to_model location =
 
 query_to_model =
     UP.query
-        <| UPQ.map2 Model query_to_disks query_to_params
+        <| UPQ.map3 Model query_to_disks query_to_params query_to_dg
 
 query_to_params =
     UPQ.map4 RaidParams
@@ -407,6 +435,12 @@ query_to_disks =
              >> List.map (\x -> case x of
                                     Nothing -> Debug.todo "should never happen"
                                     Just v -> v))
+
+query_to_dg =
+    UPQ.map parse_to_bool (UPQ.int "dg")
+
+parse_to_bool x =
+    Maybe.withDefault 1 x |> (==) 1
 
 -- Model
 
@@ -539,15 +573,22 @@ min_arg pred list =
                         else
                             Just min_rest
 
+string_from_bool v =
+    case v of
+        True -> "true"
+        False -> "false"
+
 raid_preset: RaidPreset -> RaidParams
 raid_preset preset =
     case preset of
         Single  -> { c=1, slo=1, shi=1,   p=0 }
         RAID0   -> { c=1, slo=2, shi=100, p=0 }
+        RAID0d  -> { c=1, slo=1, shi=100, p=0 }
         RAID1   -> { c=2, slo=1, shi=1,   p=0 }
         RAID1c3 -> { c=3, slo=1, shi=1,   p=0 }
         RAID1c4 -> { c=4, slo=1, shi=1,   p=0 }
         RAID10  -> { c=2, slo=2, shi=100, p=0 }
+        RAID10d -> { c=2, slo=1, shi=100, p=0 }
         RAID5   -> { c=1, slo=1, shi=100, p=1 }
         RAID6   -> { c=1, slo=1, shi=100, p=2 }
 
@@ -556,9 +597,11 @@ raid_name preset =
     case preset of
         Single  -> "Single"
         RAID0   -> "RAID0"
+        RAID0d  -> "RAID0"
         RAID1   -> "RAID1"
         RAID1c3 -> "RAID1c3"
         RAID1c4 -> "RAID1c4"
         RAID10  -> "RAID10"
+        RAID10d -> "RAID10"
         RAID5   -> "RAID5"
         RAID6   -> "RAID6"

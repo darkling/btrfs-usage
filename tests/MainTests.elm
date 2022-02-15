@@ -301,7 +301,8 @@ suite =
                    in
                        location_to_model url
                    |> Expect.equal { disk_size=[1000],
-                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                     raid_level={ c=1, slo=1, shi=4, p=1 },
+                                     degen_kernel=True
                                    },
                test "Should parse a full URL with a one-element path" <|
                    \_ ->
@@ -310,7 +311,8 @@ suite =
                    in
                        location_to_model url
                    |> Expect.equal { disk_size=[1000],
-                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                     raid_level={ c=1, slo=1, shi=4, p=1 },
+                                     degen_kernel=True
                                    },
                test "Should parse a full URL with a two-element path" <|
                    \_ ->
@@ -319,7 +321,8 @@ suite =
                    in
                        location_to_model url
                    |> Expect.equal { disk_size=[1000],
-                                     raid_level={ c=1, slo=1, shi=4, p=1 }
+                                     raid_level={ c=1, slo=1, shi=4, p=1 },
+                                     degen_kernel=True
                                    }
              ]
         ]
