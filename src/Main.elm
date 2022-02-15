@@ -167,13 +167,15 @@ view model =
                  <| view_num_devices model.disk_size,
              div [ class "main-section" ]
                  [ h2 []  [ text "RAID levels" ],
-                   div [ class "float-right" ]
-                       <| view_raid_presets
-                              model.raid_level
-                              (List.length model.disk_size),
-                   div [ class "raid-params" ]
-                       [ view_raid_params model.raid_level ],
-                   div [ style "clear" "both" ] []
+                   div [ class "left-right-layout" ]
+                       [ div [ class "raid-params" ]
+                             <| view_raid_presets
+                                  model.raid_level
+                                  (List.length model.disk_size),
+                         div [ class "detailed-params" ]
+                         [ view_raid_params model.raid_level ],
+                         div [ style "clear" "both" ] []
+                       ]
                  ],
              div [ class "main-section" ]
                  [ h2 [] [ text "Device sizes" ],
@@ -186,12 +188,10 @@ view model =
                        text "The results shown here do not take account of the space used by metadata, and are therefore approximate."
                        ],
                    p [] [
-                       text "This is a beta release. Please report any bugs found to the ",
+                       text "Please report any bugs found to the ",
                        a [ href "https://github.com/darkling/btrfs-usage/issues" ]
                        [ text "issue tracker" ],
-                       text ". The ",
-                       a [ href "/btrfs-usage-old/" ] [ text "old version" ],
-                       text " is still available."
+                       text "."
                        ]
                  ]
             ]

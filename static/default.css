@@ -31,8 +31,11 @@ input {
 input.disk-size {
     width: 5em;
 }
-.float-right {
-	float: right;
+.left-right-layout {
+	display: flex;
+}
+.raid-params {
+	margin-right: 4em;
 }
 .usage-bar {
     height: 10px;
